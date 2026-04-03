@@ -17,7 +17,7 @@ select * FROM revenue;
 
 with cte1 as (
     select *,
-    lag(amount) over () as prev_month_amount
+    lag(amount) over (order by month) as prev_month_amount
     from revenue
 )select month,amount,prev_month_amount from cte1 
 where prev_month_amount > amount 
