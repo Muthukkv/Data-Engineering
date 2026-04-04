@@ -26,3 +26,18 @@ count(*) - sum(case when co.order_date = fv.first_visit_date then 1 else 0 end) 
 from customer_orders co join first_visit fv 
 on co.customer_id = fv.customer_id
 group by co.order_date
+
+
+-- approach with window function
+
+with cte1 as (
+    select *,
+    row_number() over (partition by customer_id order by order_date) as rn
+    from customer_orders
+),cte2 as (
+    select order_date,
+    sum(case when rn = 1 then 1 else 0 end) as new_cust,
+    count(*) - sum(case when rn = 1 then 1 else 0 end) as old_cust
+    from cte1 group by order_date
+)
+select * from cte2
